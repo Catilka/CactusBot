@@ -5,12 +5,12 @@ const readline = require('readline')
 
 // Конфигурация бота
 const botConfig = {
-    host: 'play.funtime.su', // Укажите IP сервера
-    port: 25565,       // Укажите порт сервера
+    host: 'play.funtime.su', // IP сервера FunTime
+    port: 25565,       // Порт сервера
     username: 'CactusBot', // Имя бота
-    version: '1.20.1', // Укажите версию сервера (или 'auto' для Spigot/Paper)
-    telegramBotToken: '8147094752:AAFwDBV9ko0kn5UwuU7uy7vdnzid9QEHlQo', // Замените на ваш Telegram Bot Token
-    telegramChatId: '-1002590113844' // Замените на ваш Telegram Chat ID
+    version: '1.20.1', // Версия сервера
+    telegramBotToken: '8147094752:AAFwDBV9ko0kn5UwuU7uy7vdnzid9QEHlQo', // Telegram Bot Token
+    telegramChatId: '-1002590113844' // Telegram Chat ID
 }
 
 const telegramBot = new TelegramBot(botConfig.telegramBotToken, { polling: false })
@@ -75,9 +75,24 @@ function createBot() {
   // Обработка сообщений чата
   bot.on('chat', (username, message) => {
     if (username === bot.username) return // Игнорируем собственные сообщения
-    // Вывод сообщений о балансе
+    // Проверяем сообщения о балансе
     if (message.toLowerCase().includes('баланс') || message.match(/\+.*баланс/i)) {
       console.log(`[Чат] ${username}: ${message}`)
+      // Попытка извлечь баланс из сообщения
+      const balanceMatch = message.match(/баланс.*?:?\s*(\d+)/i)
+      if (balanceMatch) {
+        const balance = balanceMatch[1]
+        const telegramMessage = `Баланс бота (${botConfig.username}) на FunTime: ${balance}`
+        // Отправляем баланс в Telegram
+        telegramBot.sendMessage(botConfig.telegramChatId, telegramMessage)
+          .then(() => console.log(`Отправлено в Telegram: ${telegramMessage}`))
+          .catch(err => console.error('Ошибка отправки в Telegram:', err.message))
+      } else {
+        // Если не удалось извлечь баланс, отправляем полное сообщение
+        telegramBot.sendMessage(botConfig.telegramChatId, `Сообщение о балансе: ${message}`)
+          .then(() => console.log(`Отправлено в Telegram: ${message}`))
+          .catch(err => console.error('Ошибка отправки в Telegram:', err.message))
+      }
     }
   })
 
@@ -85,23 +100,37 @@ function createBot() {
   bot.on('spawn', async () => {
       bot.chat("/l 1")
       await bot.waitForTicks(20)
-    bot.chat("/an303")
-    console.log('Бот заспавнился!')
-    await bot.waitForTicks(20) // Ждем 1 секунду для стабилизации
+      bot.chat("/an303")
+      console.log('Бот заспавнился!')
+      await bot.waitForTicks(20) // Ждем 1 секунду для стабилизации
 
-    // Цикл для отправки /bal каждые 5 секунд
-    setInterval(() => {
-      if (!isCaptchaActive) {
-        try {
-          bot.chat('/bal')
-          console.log('Отправлена команда /bal')
-        } catch (err) {
-          console.log('Ошибка при отправке /bal:', err.message)
+      // Цикл для отправки /bal каждые 5 секунд
+      setInterval(() => {
+        if (!isCaptchaActive) {
+          try {
+            bot.chat('/bal')
+            console.log('Отправлена команда /bal')
+          } catch (err) {
+            console.log('Ошибка при отправке /bal:', err.message)
+          }
+        } else {
+          console.log('Отправка /bal приостановлена из-за активной капчи')
         }
-      } else {
-        console.log('Отправка /bal приостановлена из-за активной капчи')
-      }
-    }, 5000) // 5000 мс = 5 секунд
+      }, 5000) // 5000 мс = 5 секунд
+
+      // Цикл для выполнения ЛКМ каждые 2 секунды
+      setInterval(() => {
+        if (!isCaptchaActive) {
+          try {
+            bot.swingArm('left')
+            console.log('Бот выполнил ЛКМ')
+          } catch (err) {
+            console.log('Ошибка при выполнении ЛКМ:', err.message)
+          }
+        } else {
+          console.log('ЛКМ приостановлен из-за активной капчи')
+        }
+      }, 2000) // 2000 мс = 2 секунды
   })
 
   // Обработка ошибок чтения пакетов
