@@ -7,7 +7,7 @@ const readline = require('readline')
 const botConfig = {
     host: 'play.funtime.su', // IP сервера FunTime
     port: 25565,       // Порт сервера
-    username: 'CactusBot', // Имя бота
+    username: 'StrongermanFeng', // Имя бота
     version: '1.20.1', // Версия сервера
     telegramBotToken: '8147094752:AAFwDBV9ko0kn5UwuU7uy7vdnzid9QEHlQo', // Telegram Bot Token
     telegramChatId: '-1002590113844' // Telegram Chat ID
@@ -100,7 +100,7 @@ function createBot() {
   bot.on('spawn', async () => {
       bot.chat("/l 1")
       await bot.waitForTicks(20)
-      bot.chat("/an303")
+      bot.chat("/an206")
       console.log('Бот заспавнился!')
       await bot.waitForTicks(20) // Ждем 1 секунду для стабилизации
 
