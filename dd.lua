@@ -12,7 +12,7 @@ local Discord_Invite = 'https://discord.gg/zYq89UmXEj'
 local UI_Theme = 'Dark' -- Can be 'Dark', 'Light', 'Nord', 'Solarized' or 'Dracula'
 
 -- Ad-link settings
-local Linkvertise_Enabled = true
+local Linkvertise_Enabled = false
 local Linkvertise_Link = 'https://ads.luarmor.net/get_key?for=Rivals_KEY-xruvyEeDEsqS'
 
 local Lootlabs_Enabled = false
